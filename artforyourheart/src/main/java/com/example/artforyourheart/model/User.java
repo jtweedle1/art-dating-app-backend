@@ -1,4 +1,4 @@
-package com.example.artforyourheart;
+package com.example.artforyourheart.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
