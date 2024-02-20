@@ -52,8 +52,10 @@ public class UserController {
         List<String> no = (List<String>) payload.get("no");
         String role = (String) payload.get("role");
         String bio = (String) payload.get("bio");
+        String username = (String) payload.get("username");
+        String password = (String) payload.get("password");
 
-        User user = userService.createUser(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio) ;
+        User user = userService.createUser(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, password) ;
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
 

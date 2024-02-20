@@ -30,11 +30,14 @@ public class User {
     private String role;
 
     private String bio;
+    private String username;
+   private String password;
 
-    public User(Integer age, String name, String location, String gender, String art, String artPhotos, String photos, String height, List<String> matches, List<String> yes, List<String> no, String role, String bio){
+    public User(Integer age, String name, String location, String gender, String art, String artPhotos, String photos, String height, List<String> matches, List<String> yes, List<String> no, String role, String bio, String username, String password){
      this.age = age;
      this.name = name;
-     this.location = gender;
+     this.gender = gender;
+     this.location = location;
      this.art = art;
      this.artPhotos = artPhotos;
      this.photos= photos;
@@ -44,6 +47,8 @@ public class User {
      this.no=no;
      this.role=role;
      this.bio=bio;
+     this.username= username;
+     this.password= password;
     }
 
 
