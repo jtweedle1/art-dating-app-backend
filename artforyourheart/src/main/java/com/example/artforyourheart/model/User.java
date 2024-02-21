@@ -2,6 +2,8 @@ package com.example.artforyourheart.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -10,8 +12,10 @@ import java.util.List;
 @Data
 //@NoArgsConstructor is setter injection
 @NoArgsConstructor
-@Document(collection="users")
+@Document(collection="user")
 public class User {
+ @Id
+ private ObjectId id;
    private Integer age;
     private String name;
     private String location;

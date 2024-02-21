@@ -13,6 +13,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    public List<User> allUsers(){
+        System.out.println(userRepository.findAll());
+        return userRepository.findAll();
+    }
+
 
 
 
