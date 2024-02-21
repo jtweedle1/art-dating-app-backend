@@ -33,14 +33,17 @@ public class UserController {
 
 
 
+    // Login
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestBody User credentials) {
+        User user = userService.login(credentials.getUsername(), credentials.getPassword());
 
-
-
-
-
-
-
-
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
 
 
 

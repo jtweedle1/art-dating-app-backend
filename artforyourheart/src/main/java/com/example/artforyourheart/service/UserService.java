@@ -13,16 +13,23 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    //getAll
     public List<User> allUsers(){
         System.out.println(userRepository.findAll());
         return userRepository.findAll();
     }
 
 
+    //login
+    public User login(String username, String password) {
+        User user = userRepository.findByUsername(username);
 
-
-
-
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        } else {
+            return null;
+        }
+    }
 
 
 
