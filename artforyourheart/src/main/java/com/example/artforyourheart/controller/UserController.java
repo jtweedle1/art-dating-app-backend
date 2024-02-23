@@ -3,6 +3,7 @@ package com.example.artforyourheart.controller;
 
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
+import com.example.artforyourheart.service.LikesService;
 import com.example.artforyourheart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LikesService likesService;
     //get one
     @GetMapping("/{id}")
     public ResponseEntity<?> getOneUser(@PathVariable String id){
@@ -28,6 +31,8 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    //matching
 
     //get all
     @GetMapping

@@ -2,6 +2,7 @@ package com.example.artforyourheart.service;
 
 
 import com.example.artforyourheart.model.User;
+import com.example.artforyourheart.repository.LikesRepository;
 import com.example.artforyourheart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LikesRepository likesRepository;
 
     //getOne
     //Optional handles possibility of not being able to find a particular user due to no match
