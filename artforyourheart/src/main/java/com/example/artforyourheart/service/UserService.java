@@ -3,6 +3,7 @@ package com.example.artforyourheart.service;
 
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,13 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    //patch route
-    //need to discuss
+    //put
+    public User updateUser(ObjectId id, User updatedUser) {
+        // set user ID to make sure it matches the existing user you want to update
+        updatedUser.setId(id);
+        // save updated user, overwriting the existing user with the same ID
+        return userRepository.save(updatedUser);
+    }
 
     //deleteOne
     public void deleteOneUser(String id) {
