@@ -5,6 +5,7 @@ import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
 import com.example.artforyourheart.service.LikesService;
 import com.example.artforyourheart.service.UserService;
+import com.example.artforyourheart.service.MatchingService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class UserController {
 
     @Autowired
     private LikesService likesService;
+
+    @Autowired
+    private MatchingService matchingService;
     //get one
     @GetMapping("/{id}")
     public ResponseEntity<?> getOneUser(@PathVariable String id){
@@ -89,6 +93,20 @@ public class UserController {
 
         User user = userService.createUser(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, password) ;
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/main")
+    public ResponseEntity<List<User>> getUsersToSwipe(@RequestParam String userId) {
+        Optional<User> currentUserOptional = userService.findOneUser(userId);
+        User currentUser = currentUserOptional.get();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<User> swipeableUsers = matchingService.findCompatibleMatches(userId);
+        if (swipeableUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(swipeableUsers);
     }
 
 }
