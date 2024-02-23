@@ -4,6 +4,7 @@ package com.example.artforyourheart.controller;
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
 import com.example.artforyourheart.service.UserService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,11 @@ public class UserController {
     }
 
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable ObjectId id, @RequestBody User updatedUser) {
+        User user = userService.updateUser(id, updatedUser);
+        return ResponseEntity.ok(user);
+    }
 
 
     //post register user
