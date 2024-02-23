@@ -91,4 +91,17 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
 
+    @GetMapping("/main")
+    public ResponseEntity<List<User>> getUsersToSwipe(@RequestParam String userId) {
+        Optional<User> currentUser = userService.findOneUser(userId);
+        if (currentUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<User> swipeableUsers = matchingAlgorithm.findCompatibleMatches(currentUser, userService.allUsers(), userService);
+        if (swipeableUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(swipeableUsers);
+    }
+
 }
