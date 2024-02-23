@@ -18,6 +18,11 @@ public class LikesService {
     @Autowired
     private LikesRepository likesRepository;
 
+    //getAll
+    public List<Like> allLikes(){
+        System.out.println(likesRepository.findAll());
+        return likesRepository.findAll();
+    }
     public void recordLike(Like like) {
         if (!likesRepository.existsByLikerIdAndLikeeId(like.getLikerId(), like.getLikeeId())) {
             likesRepository.save(like);

@@ -4,6 +4,7 @@ import com.example.artforyourheart.model.Like;
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.service.LikesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,10 @@ public class LikesController {
     @Autowired
     private LikesService likesService;
 
+    @GetMapping
+    public ResponseEntity<List<Like>> getAllLikes(){
+        return new ResponseEntity<List<Like>>(likesService.allLikes(), HttpStatus.OK);
+    }
     @PostMapping
     public ResponseEntity<?> likeUser(@RequestBody Like like) {
         likesService.recordLike(like);
