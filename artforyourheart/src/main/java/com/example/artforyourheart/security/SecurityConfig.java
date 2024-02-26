@@ -6,6 +6,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        // Apply the lambda-based configuration
+                        // apply the lambda-based configuration
                         .requestMatchers("/", "/home", "/public/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
@@ -27,5 +29,18 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout.permitAll());
         return http.build();
+    }
+
+    // CORS configuration to allow backend (8080) to receive requests from the frontend (3000)
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); // necessary if we implement cookies, authorization headers with HTTPS
+        config.addAllowedOrigin("http://localhost:3000"); // replace with frontend url if necessary
+        config.addAllowedHeader("*"); // allow all headers
+        config.addAllowedMethod("*"); // allow all methods
+        source.registerCorsConfiguration("/**", config); // apply these settings to all routes
+        return source;
     }
 }
