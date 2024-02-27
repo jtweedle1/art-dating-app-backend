@@ -7,6 +7,8 @@ import com.example.artforyourheart.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private LikesRepository likesRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     //getOne
     //Optional handles possibility of not being able to find a particular user due to no match
@@ -48,18 +53,18 @@ public class UserService {
     public User login(String username, String password) {
         User user = userRepository.findByUsername(username);
 
-        if (user != null && user.getPassword().equals(password)) {
+        //matches method checks if passwords match
+        if (user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
             return user;
         } else {
             return null;
         }
     }
 
-
-
     //post register user
     public User createUser(Integer age, String name, String location, String gender, String art, String artPhotos, String photos, String height, List<String> matches, List<String> yes, List<String> no, String role, String bio, String username, String password){
-        User user = new User(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, password);
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+        User user = new User(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, encodedPassword);
         User savedUser = userRepository.insert(user);
         return savedUser;
     }

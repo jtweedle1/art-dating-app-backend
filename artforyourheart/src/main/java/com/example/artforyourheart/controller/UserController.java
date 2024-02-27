@@ -63,7 +63,7 @@ public class UserController {
         }
     }
 
-
+    // update user (please note that the server is expecting every field to not be null)
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable ObjectId id, @RequestBody User updatedUser) {
         User user = userService.updateUser(id, updatedUser);
