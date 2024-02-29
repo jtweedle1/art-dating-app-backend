@@ -24,8 +24,8 @@ public class User {
     private String location;
     private String gender;
     private String bio;
-    private String realPhoto;
-    List<String> artPhotos;
+    private String realPhoto; // in URL format
+    List<String> artPhotos; // as a list of URLS
     List<String> interests;
     List<String> matches;
     List<String> yes;
@@ -41,8 +41,8 @@ public class User {
         this.location = location;
         this.gender = gender;
         this.bio = bio;
-        this.realPhoto = realPhoto; // in URL format
-        this.artPhotos = artPhotos; // as a list of URLS
+        this.realPhoto = realPhoto;
+        this.artPhotos = artPhotos;
         this.interests = interests;
         this.matches = matches;
         this.yes = yes;
