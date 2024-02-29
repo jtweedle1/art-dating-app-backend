@@ -57,25 +57,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // Login
-//    @PostMapping("/login")
-//    public ResponseEntity<User> login(@RequestBody User credentials) {
-//        User user = userService.login(credentials.getUsername(), credentials.getPassword());
-//
-//        if (user != null) {
-//            return new ResponseEntity<>(user, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//    }
-
     // update user (please note that the server is expecting every field to not be null)
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable ObjectId id, @RequestBody User updatedUser) {
         User user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }
-
 
     //post register user
     @PostMapping
