@@ -1,6 +1,7 @@
 package com.example.artforyourheart.security;
 
 import com.example.artforyourheart.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,10 @@ public class SecurityConfig {
 
     @Autowired
     UserRepository userRepository;
+
+    // Spring Boot automatically configures this Object Mapper to convert response to JSON, which will be necessary for the frontend to receive and manipulate user data
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -78,8 +83,18 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         return (request, response, authentication) -> {
-            response.setHeader("Location", "http://localhost:3000/main");
-            response.setStatus(HttpServletResponse.SC_OK);
+            String username = authentication.getName();
+            com.example.artforyourheart.model.User user = userRepository.findByUsername(username);
+            if (user != null) {
+                // We should consider only including necessary information in the response using a DTO before serializing into JSON
+                user.setPassword(null); // Setting password to null to avoid giving the user/frontend access to the password and to prevent being saved in localStorage
+                response.setContentType("application/json;charset=UTF-8"); // Setting response to JSON
+                response.getWriter().write(objectMapper.writeValueAsString(user));
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                // Handle the case where the user is not found (should not happen if authentication was successful)
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
         };
     }
 
