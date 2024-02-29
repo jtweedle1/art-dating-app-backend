@@ -85,7 +85,7 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
 
-    // Get the home screen
+    // Get the home screen and matchable users
     @GetMapping("/main")
     public ResponseEntity<List<User>> getUsersToSwipe(@RequestParam String userId) {
         Optional<User> currentUserOptional = userService.findOneUser(userId);

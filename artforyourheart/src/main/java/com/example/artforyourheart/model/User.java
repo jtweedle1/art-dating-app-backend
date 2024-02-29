@@ -9,9 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Data is lombok import that handles getters & setters
+//@Data is lombok import that handles getters & setters so that we don't have to list them explicitly
 @Data
-//@NoArgsConstructor is setter injection
 @NoArgsConstructor
 @Document(collection = "user")
 public class User {
@@ -42,14 +41,12 @@ public class User {
         this.location = location;
         this.gender = gender;
         this.bio = bio;
-        this.realPhoto = realPhoto;
-        this.artPhotos = artPhotos;
+        this.realPhoto = realPhoto; // in URL format
+        this.artPhotos = artPhotos; // as a list of URLS
         this.interests = interests;
         this.matches = matches;
         this.yes = yes;
         this.no = no;
         this.roles = roles;
     }
-
-
 }
