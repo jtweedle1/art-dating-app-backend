@@ -16,6 +16,7 @@ import java.util.List;
 public class User {
     @Id
     private ObjectId id;
+    private String stringId;
     private String username;
     private String password;
     private String name;
@@ -33,6 +34,8 @@ public class User {
     private List<String> roles = new ArrayList<>();
 
     public User(String username, String password, String name, Integer age, String height, String location, String gender, String bio, String realPhoto, List<String> artPhotos, List<String> interests, List<String> matches, List<String> yes, List<String> no, List<String> roles) {
+        this.id = ObjectId.get();
+        this.stringId = id.toHexString();
         this.username = username;
         this.password = password;
         this.name = name;
