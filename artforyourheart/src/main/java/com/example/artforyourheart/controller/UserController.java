@@ -1,6 +1,8 @@
 package com.example.artforyourheart.controller;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.example.artforyourheart.cloudinary.CloudinaryService;
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
 import com.example.artforyourheart.service.LikesService;
@@ -18,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,19 +38,23 @@ public class UserController {
 
     @Autowired
     private MatchingService matchingService;
-    //get one
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    // Get one user (by ID)
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOneUser(@PathVariable String id){
+    public ResponseEntity<?> getOneUser(@PathVariable String id) {
         return userService.findOneUser(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //matching
-
-    //get all
+    // Get all users
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
+    public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<List<User>>(userService.allUsers(), HttpStatus.OK);
     }
 
@@ -56,51 +64,53 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // Login
-//    @PostMapping("/login")
-//    public ResponseEntity<User> login(@RequestBody User credentials) {
-//        User user = userService.login(credentials.getUsername(), credentials.getPassword());
-//
-//        if (user != null) {
-//            return new ResponseEntity<>(user, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//    }
-
-    // update user (please note that the server is expecting every field to not be null)
+    // Updated an existing user (please note that the server is expecting every field to not be null)
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable ObjectId id, @RequestBody User updatedUser) {
         User user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }
 
-
-    //post register user
+    // Register a new user
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody Map<String, Object> payload) {
-        Integer age = (Integer) payload.get("age");
-        String name = (String) payload.get("name");
-        String location = (String) payload.get("location");
-        String gender = (String) payload.get("gender");
-        String art = (String) payload.get("art");
-        String artPhotos = (String) payload.get("artPhotos");
-        String photos = (String) payload.get("photos");
-        String height = (String) payload.get("height");
-        List<String> interests = (List<String>) payload.get("interests");
-        List<String> matches = (List<String>) payload.get("matches");
-        List<String> yes = (List<String>) payload.get("yes");
-        List<String> no = (List<String>) payload.get("no");
-        List<String> roles = (List<String>) payload.get("roles");
-        String role = (String) payload.get("role");
-        String bio = (String) payload.get("bio");
-        String username = (String) payload.get("username");
-        String password = (String) payload.get("password");
+    public ResponseEntity<User> createUser(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("name") String name,
+            @RequestParam("age") Integer age,
+            @RequestParam("height") String height,
+            @RequestParam("location") String location,
+            @RequestParam("gender") String gender,
+            @RequestParam("bio") String bio,
+            @RequestParam("realPhoto") MultipartFile realPhoto,
+            @RequestParam("artPhotos") List<MultipartFile> artPhotos,
+            @RequestParam("interests") List<String> interests,
+            @RequestParam(value = "matches", required = false) List<String> matches,
+            @RequestParam(value = "yes", required = false) List<String> yes,
+            @RequestParam(value = "no", required = false) List<String> no,
+            @RequestParam("roles") List<String> roles) throws IOException {
 
-        User user = userService.createUser(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, password, roles) ;
-        return new ResponseEntity<User>(user, HttpStatus.CREATED);
+        // Creating user WITHOUT photo URLS first (because we won't have ID until after user is created, and we need the ID for the photo upload)
+        User user = userService.createUser(username, password, name, age, height, location, gender, bio, null, null, interests, matches, yes, no, roles);
+        logger.info("Initial user", user);
+        // Get the ID from the user after they're created
+        String userId = user.getId().toString();
+        logger.info("String userId", user);
+        ObjectId userObjectId = new ObjectId(userId);
+        // Uploading the photos to Cloudinary
+        String realPhotoUrl = cloudinaryService.uploadRealPhoto(realPhoto, userId);
+        logger.info("realPhoto URL", user);
+        List<String> artPhotoUrls = cloudinaryService.uploadArtPhotos(artPhotos, userId);
+        logger.info("artPhotos URL", user);
+        // Update user with the photo URLs saved to be used and rendered later
+        user.setRealPhoto(realPhotoUrl);
+        user.setArtPhotos(artPhotoUrls);
+        logger.info("Updated user", user);
+        User updatedUser = userService.updateUser(user.getId(), user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
     }
 
+    // Get the home screen and matchable users
     @GetMapping("/main")
     public ResponseEntity<List<User>> getUsersToSwipe(@RequestParam String userId) {
         Optional<User> currentUserOptional = userService.findOneUser(userId);
@@ -115,7 +125,7 @@ public class UserController {
         return ResponseEntity.ok(swipeableUsers);
     }
 
-    //authentication check
+    // Checks if user is authenticated; redundant now that we know it is implemented correctly (user is only authenticated if they successfully are logged in)
     @GetMapping("/api/auth/check")
     public ResponseEntity<?> checkAuthentication(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
