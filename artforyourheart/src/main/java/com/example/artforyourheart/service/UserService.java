@@ -26,12 +26,12 @@ public class UserService {
 
     //getOne
     //Optional handles possibility of not being able to find a particular user due to no match
-    public Optional<User> findOneUser(String id){
+    public Optional<User> findOneUser(String id) {
         return userRepository.findById(id);
     }
 
     //getAll
-    public List<User> allUsers(){
+    public List<User> allUsers() {
         System.out.println(userRepository.findAll());
         return userRepository.findAll();
     }
@@ -62,9 +62,9 @@ public class UserService {
     }
 
     //post register user
-    public User createUser(Integer age, String name, String location, String gender, String art, String artPhotos, String photos, String height, List<String> matches, List<String> yes, List<String> no, String role, String bio, String username, String password, List<String> roles){
+    public User createUser(String username, String password, String name, Integer age, String height, String location, String gender, String bio, String realPhoto, List<String> artPhotos, List<String> interests, List<String> matches, List<String> yes, List<String> no, List<String> roles) {
         String encodedPassword = bCryptPasswordEncoder.encode(password);
-        User user = new User(age, name, location, gender, art, artPhotos,photos, height ,matches, yes, no, role, bio, username, encodedPassword, roles);
+        User user = new User(username, password, name, age, height, location, gender, bio, realPhoto, artPhotos, interests, matches, yes, no, roles);
         User savedUser = userRepository.insert(user);
         return savedUser;
     }
