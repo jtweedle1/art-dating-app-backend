@@ -64,7 +64,7 @@ public class UserService {
     //post register user
     public User createUser(String username, String password, String name, Integer age, String height, String location, String gender, String bio, String realPhoto, List<String> artPhotos, List<String> interests, List<String> matches, List<String> yes, List<String> no, List<String> roles) {
         String encodedPassword = bCryptPasswordEncoder.encode(password);
-        User user = new User(username, password, name, age, height, location, gender, bio, realPhoto, artPhotos, interests, matches, yes, no, roles);
+        User user = new User(username, encodedPassword, name, age, height, location, gender, bio, realPhoto, artPhotos, interests, matches, yes, no, roles);
         User savedUser = userRepository.insert(user);
         return savedUser;
     }

@@ -25,11 +25,11 @@ public class User {
     private String gender;
     private String bio;
     private String realPhoto; // in URL format
-    List<String> artPhotos; // as a list of URLS
-    List<String> interests;
-    List<String> matches;
-    List<String> yes;
-    List<String> no;
+    List<String> artPhotos = new ArrayList<>(); // as a list of URLS
+    List<String> interests = new ArrayList<>();
+    List<String> matches = new ArrayList<>();
+    List<String> yes = new ArrayList<>();
+    List<String> no = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
 
     public User(String username, String password, String name, Integer age, String height, String location, String gender, String bio, String realPhoto, List<String> artPhotos, List<String> interests, List<String> matches, List<String> yes, List<String> no, List<String> roles) {

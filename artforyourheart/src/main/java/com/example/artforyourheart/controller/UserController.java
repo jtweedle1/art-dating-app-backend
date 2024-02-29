@@ -1,6 +1,7 @@
 package com.example.artforyourheart.controller;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.artforyourheart.cloudinary.CloudinaryService;
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
@@ -40,6 +41,8 @@ public class UserController {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     // Get one user (by ID)
     @GetMapping("/{id}")
@@ -82,25 +85,29 @@ public class UserController {
             @RequestParam("realPhoto") MultipartFile realPhoto,
             @RequestParam("artPhotos") List<MultipartFile> artPhotos,
             @RequestParam("interests") List<String> interests,
-            @RequestParam("matches") List<String> matches,
-            @RequestParam("yes") List<String> yes,
-            @RequestParam("no") List<String> no,
+            @RequestParam(value = "matches", required = false) List<String> matches,
+            @RequestParam(value = "yes", required = false) List<String> yes,
+            @RequestParam(value = "no", required = false) List<String> no,
             @RequestParam("roles") List<String> roles) throws IOException {
 
         // Creating user WITHOUT photo URLS first (because we won't have ID until after user is created, and we need the ID for the photo upload)
         User user = userService.createUser(username, password, name, age, height, location, gender, bio, null, null, interests, matches, yes, no, roles);
+        logger.info("Initial user", user);
         // Get the ID from the user after they're created
         String userId = user.getId().toString();
+        logger.info("String userId", user);
         ObjectId userObjectId = new ObjectId(userId);
         // Uploading the photos to Cloudinary
         String realPhotoUrl = cloudinaryService.uploadRealPhoto(realPhoto, userId);
+        logger.info("realPhoto URL", user);
         List<String> artPhotoUrls = cloudinaryService.uploadArtPhotos(artPhotos, userId);
+        logger.info("artPhotos URL", user);
         // Update user with the photo URLs saved to be used and rendered later
         user.setRealPhoto(realPhotoUrl);
         user.setArtPhotos(artPhotoUrls);
-        userService.updateUser(userObjectId, user);
-
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        logger.info("Updated user", user);
+        User updatedUser = userService.updateUser(user.getId(), user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
     }
 
     // Get the home screen and matchable users
