@@ -35,7 +35,7 @@ public class UserController {
     @Autowired
     private MatchingService matchingService;
 
-    //get one
+    // Get one user (by ID)
     @GetMapping("/{id}")
     public ResponseEntity<?> getOneUser(@PathVariable String id) {
         return userService.findOneUser(id)
@@ -43,9 +43,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //matching
-
-    //get all
+    // Get all users
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<List<User>>(userService.allUsers(), HttpStatus.OK);
@@ -57,14 +55,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // update user (please note that the server is expecting every field to not be null)
+    // Updated an existing user (please note that the server is expecting every field to not be null)
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable ObjectId id, @RequestBody User updatedUser) {
         User user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }
 
-    //post register user
+    // Register a new user
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody Map<String, Object> payload) {
         String username = (String) payload.get("username");
@@ -87,6 +85,7 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
 
+    // Get the home screen
     @GetMapping("/main")
     public ResponseEntity<List<User>> getUsersToSwipe(@RequestParam String userId) {
         Optional<User> currentUserOptional = userService.findOneUser(userId);
@@ -101,7 +100,7 @@ public class UserController {
         return ResponseEntity.ok(swipeableUsers);
     }
 
-    //authentication check
+    // Checks if user is authenticated; redundant now that we know it is implemented correctly (user is only authenticated if they successfully are logged in)
     @GetMapping("/api/auth/check")
     public ResponseEntity<?> checkAuthentication(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
