@@ -1,6 +1,7 @@
 package com.example.artforyourheart.controller;
 
 
+import com.example.artforyourheart.cloudinary.CloudinaryService;
 import com.example.artforyourheart.model.User;
 import com.example.artforyourheart.repository.UserRepository;
 import com.example.artforyourheart.service.LikesService;
@@ -18,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +37,9 @@ public class UserController {
 
     @Autowired
     private MatchingService matchingService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     // Get one user (by ID)
     @GetMapping("/{id}")
@@ -64,25 +70,37 @@ public class UserController {
 
     // Register a new user
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody Map<String, Object> payload) {
-        String username = (String) payload.get("username");
-        String password = (String) payload.get("password");
-        String name = (String) payload.get("name");
-        Integer age = (Integer) payload.get("age");
-        String height = (String) payload.get("height");
-        String location = (String) payload.get("location");
-        String gender = (String) payload.get("gender");
-        String bio = (String) payload.get("bio");
-        String realPhoto = (String) payload.get("realPhoto");
-        List<String> artPhotos = (List<String>) payload.get("artPhotos");
-        List<String> interests = (List<String>) payload.get("interests");
-        List<String> matches = (List<String>) payload.get("matches");
-        List<String> yes = (List<String>) payload.get("yes");
-        List<String> no = (List<String>) payload.get("no");
-        List<String> roles = (List<String>) payload.get("roles");
+    public ResponseEntity<User> createUser(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("name") String name,
+            @RequestParam("age") Integer age,
+            @RequestParam("height") String height,
+            @RequestParam("location") String location,
+            @RequestParam("gender") String gender,
+            @RequestParam("bio") String bio,
+            @RequestParam("realPhoto") MultipartFile realPhoto,
+            @RequestParam("artPhotos") List<MultipartFile> artPhotos,
+            @RequestParam("interests") List<String> interests,
+            @RequestParam("matches") List<String> matches,
+            @RequestParam("yes") List<String> yes,
+            @RequestParam("no") List<String> no,
+            @RequestParam("roles") List<String> roles) throws IOException {
 
-        User user = userService.createUser(username, password, name, age, height, location, gender, bio, realPhoto, artPhotos, interests, matches, yes, no, roles);
-        return new ResponseEntity<User>(user, HttpStatus.CREATED);
+        // Creating user WITHOUT photo URLS first (because we won't have ID until after user is created, and we need the ID for the photo upload)
+        User user = userService.createUser(username, password, name, age, height, location, gender, bio, null, null, interests, matches, yes, no, roles);
+        // Get the ID from the user after they're created
+        String userId = user.getId().toString();
+        ObjectId userObjectId = new ObjectId(userId);
+        // Uploading the photos to Cloudinary
+        String realPhotoUrl = cloudinaryService.uploadRealPhoto(realPhoto, userId);
+        List<String> artPhotoUrls = cloudinaryService.uploadArtPhotos(artPhotos, userId);
+        // Update user with the photo URLs saved to be used and rendered later
+        user.setRealPhoto(realPhotoUrl);
+        user.setArtPhotos(artPhotoUrls);
+        userService.updateUser(userObjectId, user);
+
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     // Get the home screen and matchable users
