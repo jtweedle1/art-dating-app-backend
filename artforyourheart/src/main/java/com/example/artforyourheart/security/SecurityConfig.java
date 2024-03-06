@@ -50,15 +50,15 @@ public class SecurityConfig {
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
                                 // Define access control for specified paths
-                                .requestMatchers("/", "/home", "/public/**", "/login", "/main", "/users", "/users/login", "/likes", "/likes/matches", "/users/**", "/signup", "/perform_login").permitAll()
+                                .requestMatchers("/", "/home", "/public/**", "/login", "/main", "/users", "/users/login", "/likes", "/likes/matches", "/users/**", "/signup", "/perform_login", "/messages/**").permitAll()
                                 .anyRequest().authenticated() //requires authentication for any request not matched above
                 )
                 .formLogin(formLogin ->
-                        formLogin
-                                .loginProcessingUrl("/perform_login")
-                                .successHandler(successHandler())
+                                formLogin
+                                        .loginProcessingUrl("/perform_login")
+                                        .successHandler(successHandler())
 //                                .defaultSuccessUrl("/main", true) // Redirects to "/main" after successful login
-                                .permitAll()
+                                        .permitAll()
                 )
                 .logout(logout ->
                         logout.permitAll() // Allows logging out for everyone
