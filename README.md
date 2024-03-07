@@ -1,4 +1,3 @@
-# art-for-your-heart
+# Art For Your Heart (Back-end)
 
-API Documentation:
-https://api.postman.com/collections/33221299-23413c68-27c3-4422-95bb-493ea1046bf3?access_key=PMAT-01HQKZSE3Q9RFK592N5ZXZTT4A
+This is the back-end of a dating app where you upload photos of your art in addition to real photos of yourself.
